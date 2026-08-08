@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<!-- VITRINE BUILD 2026-08-08-A | catalogo publico Selecta | base: catalogo_2.html (piloto visual homologado, md5 e51dc8828f3e98f25b84f379851e3ede) | mudanca unica: bloco PRODUTOS_EXEMPLO substituido pela leitura REST de ecom_catalogo_insta (so ativos, ordem asc + criado_em desc) + boot assincrono com estados carregando/erro/vazio. Visual intocado. -->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selecta Solution — Catálogo</title>
+<meta name="description" content="Soluções inteligentes em tecnologia e bem-estar. Peça pelo WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --preto:#0B100D;
+    --preto-suave:#141B16;
+    --verde:#2FA35C;
+    --verde-claro:#4CC97D;
+    --verde-escuro:#1E7A42;
+    --fundo:#F3F6F4;
+    --card:#FFFFFF;
+    --texto:#17201A;
+    --texto-suave:#5D6B62;
+    --linha:#E1E8E3;
+    --whats:#1DA851;
+    --whats-escuro:#178443;
+    --promo:#D5432A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--fundo);
+    color:var(--texto);
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ===== Cabeçalho ===== */
+  header{
+    background:var(--preto);
+    color:#fff;
+    padding:30px 20px 26px;
+    text-align:center;
+    border-bottom:3px solid var(--verde);
+  }
+  header .logo{
+    display:block;
+    margin:0 auto;
+    width:min(280px, 70vw);
+    height:auto;
+  }
+  header .marca{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:1.6rem;
+    letter-spacing:1px;
+    line-height:1.1;
+    color:#EAF4ED;
+  }
+  header .marca span{color:var(--verde-claro)}
+  header .tagline{
+    margin-top:10px;
+    font-size:.68rem;
+    color:var(--verde-claro);
+    font-weight:500;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+  }
+  /* ===== Faixa de aviso ===== */
+  .faixa{
+    background:var(--preto-suave);
+    color:#C7D8CC;
+    text-align:center;
+    font-size:.78rem;
+    padding:8px 16px;
+    letter-spacing:.2px;
+  }
+  .faixa strong{color:var(--verde-claro);font-weight:600}
+  /* ===== Filtros de categoria ===== */
+  .filtros{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+    padding:18px 14px 0;
+  }
+  .filtros button{
+    font-family:'Inter',sans-serif;
+    font-size:.82rem;
+    font-weight:500;
+    padding:7px 16px;
+    border-radius:999px;
+    border:1px solid var(--linha);
+    background:var(--card);
+    color:var(--texto-suave);
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .filtros button.ativo{
+    background:var(--preto);
+    border-color:var(--preto);
+    color:var(--verde-claro);
+    font-weight:600;
+  }
+  /* ===== Grade ===== */
+  main{
+    max-width:920px;
+    margin:0 auto;
+    padding:20px 14px 48px;
+  }
+  .grade{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+  @media(min-width:560px){.grade{grid-template-columns:1fr 1fr}}
+  @media(min-width:860px){.grade{grid-template-columns:1fr 1fr 1fr}}
+  /* ===== Card de produto ===== */
+  .card{
+    background:var(--card);
+    border:1px solid var(--linha);
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  .card .foto{
+    aspect-ratio:1/1;
+    background:#EAEFEA;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .card .foto img{width:100%;height:100%;object-fit:cover;display:block}
+  .card .foto .sem-foto{
+    color:#9FAFA3;
+    font-size:.8rem;
+    font-weight:500;
+    text-align:center;
+    padding:12px;
+  }
+  .selo-promo{
+    position:absolute;
+    top:12px;left:12px;
+    background:var(--promo);
+    color:#fff;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:.72rem;
+    letter-spacing:.6px;
+    padding:5px 10px;
+    border-radius:6px;
+    text-transform:uppercase;
+    z-index:1;
+  }
+  .card .corpo{
+    padding:14px 14px 16px;
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    gap:10px;
+  }
+  .card h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:500;
+    font-size:1rem;
+    line-height:1.35;
+  }
+  .card .descricao{
+    font-size:.83rem;
+    color:var(--texto-suave);
+    line-height:1.5;
+  }
+  /* ===== Etiqueta de preço (assinatura visual) ===== */
+  .etiqueta{
+    margin-top:auto;
+    background:var(--preto);
+    border-radius:10px;
+    padding:11px 13px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .etiqueta .de{
+    font-size:.76rem;
+    color:#8FA396;
+  }
+  .etiqueta .de s{opacity:.9}
+  .etiqueta .por{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:1.35rem;
+    color:var(--verde-claro);
+    line-height:1.15;
+  }
+  .etiqueta .por small{
+    font-size:.72rem;
+    font-weight:500;
+    color:#8FA396;
+    font-family:'Inter',sans-serif;
+  }
+  /* ===== Botão WhatsApp ===== */
+  .btn-whats{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    background:var(--whats);
+    color:#fff;
+    text-decoration:none;
+    font-weight:600;
+    font-size:.9rem;
+    padding:12px;
+    border-radius:10px;
+    transition:background .15s;
+  }
+  .btn-whats:hover{background:var(--whats-escuro)}
+  .btn-whats svg{width:18px;height:18px;flex-shrink:0}
+  /* ===== Rodapé ===== */
+  footer{
+    background:var(--preto);
+    color:#8FA396;
+    text-align:center;
+    padding:28px 20px 36px;
+    font-size:.76rem;
+    line-height:1.7;
+    border-top:3px solid var(--verde);
+    margin-top:20px;
+  }
+  footer a{color:var(--verde-claro);text-decoration:none;font-weight:500}
+  .vazio{
+    text-align:center;
+    color:var(--texto-suave);
+    padding:60px 20px;
+    font-size:.95rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" src="logo-selecta.jpg" alt="Selecta Solution"
+       onerror="this.style.display='none';document.getElementById('marca-texto').style.display='block'">
+  <div class="marca" id="marca-texto" style="display:none">SELECTA <span>SOLUTION</span></div>
+  <div class="tagline">SOLUÇÕES INTELIGENTES EM TECNOLOGIA E BEM-ESTAR</div>
+</header>
+
+<div class="faixa">Enviamos para todo o Brasil · <strong>Nota fiscal em todas as vendas</strong></div>
+
+<div class="filtros" id="filtros" style="display:none"></div>
+
+<main>
+  <div class="grade" id="grade"></div>
+  <div class="vazio" id="vazio" style="display:none">
+    Nenhum produto disponível no momento.<br>Volte em breve — novidades chegando!
+  </div>
+</main>
+
+<footer>
+  Selecta Solution LTDA · CNPJ 46.908.715/0001-48<br>
+  Atendimento: <a href="https://wa.me/5598988861406" target="_blank" rel="noopener">WhatsApp (98) 98886-1406</a>
+</footer>
+
+<script>
+/* =====================================================================
+   CONFIGURAÇÃO
+   ===================================================================== */
+const WHATSAPP = "5598988861406";
+
+const ROTULO_CATEGORIA = {
+  "tecnologia": "Tecnologia",
+  "bem-estar": "Bem-estar"
+};
+
+/* =====================================================================
+   VITRINE BUILD 2026-08-08-A — leitura real do Supabase
+   Substitui o bloco PILOTO (dados de exemplo) previsto na Etapa 4.
+   Fonte: ecom_catalogo_insta · so ativos (RLS anon + filtro na query)
+   Ordem: ordem asc, criado_em desc (espelho do painel admin)
+   Chave publishable: publica por design; RLS e quem governa o acesso.
+   ===================================================================== */
+const SUPABASE_URL = "https://odamfhflldygdfrnnjzu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_7q_884vzxsdTLOIw7ZMx7A_qiUuUc-n";
+
+async function carregarCatalogo() {
+  const url = SUPABASE_URL
+    + "/rest/v1/ecom_catalogo_insta"
+    + "?select=nome_exibicao,descricao_curta,preco_insta,preco_de,promocao,categoria,foto_url,ordem"
+    + "&ativo=eq.true"
+    + "&order=ordem.asc,criado_em.desc";
+  const r = await fetch(url, {
+    headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+  });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
+/* =====================================================================
+   RENDERIZAÇÃO
+   ===================================================================== */
+const fmtBRL = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+const ICONE_WHATS = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.23 8.23zm4.52-6.16c-.25-.13-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.29z"/></svg>';
+
+let categoriaAtiva = "todas";
+
+function montarCard(p) {
+  const card = document.createElement("article");
+  card.className = "card";
+
+  const foto = p.foto_url
+    ? '<img src="' + p.foto_url + '" alt="' + p.nome_exibicao + '" loading="lazy">'
+    : '<div class="sem-foto">Foto em breve</div>';
+
+  const selo = p.promocao ? '<div class="selo-promo">Promoção</div>' : "";
+
+  const linhaDe = p.preco_de
+    ? '<div class="de">De: <s>' + fmtBRL(p.preco_de) + "</s></div>"
+    : "";
+
+  const msg = encodeURIComponent("Olá! Vi no Instagram da Selecta e tenho interesse no: " + p.nome_exibicao);
+  const linkWhats = "https://wa.me/" + WHATSAPP + "?text=" + msg;
+
+  card.innerHTML =
+    selo +
+    '<div class="foto">' + foto + "</div>" +
+    '<div class="corpo">' +
+      "<h2>" + p.nome_exibicao + "</h2>" +
+      (p.descricao_curta ? '<div class="descricao">' + p.descricao_curta + "</div>" : "") +
+      '<div class="etiqueta">' +
+        linhaDe +
+        '<div class="por">' + fmtBRL(p.preco_insta) + " <small>à vista ou parcelado</small></div>" +
+      "</div>" +
+      '<a class="btn-whats" href="' + linkWhats + '" target="_blank" rel="noopener">' +
+        ICONE_WHATS + "Pedir pelo WhatsApp</a>" +
+    "</div>";
+
+  return card;
+}
+
+function montarFiltros(produtos) {
+  const barra = document.getElementById("filtros");
+  const categorias = [...new Set(produtos.map(p => p.categoria || "tecnologia"))];
+  if (categorias.length < 2) { barra.style.display = "none"; return; }
+
+  barra.style.display = "flex";
+  barra.innerHTML = "";
+
+  const opcoes = ["todas", ...categorias];
+  opcoes.forEach(cat => {
+    const b = document.createElement("button");
+    b.textContent = cat === "todas" ? "Todos" : (ROTULO_CATEGORIA[cat] || cat);
+    b.className = cat === categoriaAtiva ? "ativo" : "";
+    b.onclick = () => {
+      categoriaAtiva = cat;
+      montarFiltros(produtos);
+      renderizar(produtos);
+    };
+    barra.appendChild(b);
+  });
+}
+
+function renderizar(produtos) {
+  const grade = document.getElementById("grade");
+  const vazio = document.getElementById("vazio");
+  grade.innerHTML = "";
+
+  const visiveis = categoriaAtiva === "todas"
+    ? produtos
+    : produtos.filter(p => (p.categoria || "tecnologia") === categoriaAtiva);
+
+  if (!visiveis || visiveis.length === 0) {
+    vazio.style.display = "block";
+    return;
+  }
+  vazio.style.display = "none";
+  visiveis.forEach(p => grade.appendChild(montarCard(p)));
+}
+
+(async () => {
+  const vazio = document.getElementById("vazio");
+  vazio.style.display = "block";
+  vazio.innerHTML = "Carregando catálogo…";
+  try {
+    const produtos = (await carregarCatalogo()).map(p => ({
+      ...p,
+      preco_insta: Number(p.preco_insta),
+      preco_de: p.preco_de == null ? null : Number(p.preco_de)
+    }));
+    vazio.innerHTML = "Nenhum produto disponível no momento.<br>Volte em breve — novidades chegando!";
+    vazio.style.display = "none";
+    montarFiltros(produtos);
+    renderizar(produtos);
+  } catch (e) {
+    console.error("[vitrine] falha ao carregar:", e);
+    vazio.style.display = "block";
+    vazio.innerHTML = "Catálogo temporariamente indisponível.<br>"
+      + 'Chame a gente no <a href="https://wa.me/' + WHATSAPP
+      + '" target="_blank" rel="noopener" style="color:var(--verde-escuro);font-weight:600">WhatsApp</a> — respondemos rapidinho!';
+  }
+})();
+</script>
+
+</body>
+</html>
